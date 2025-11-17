@@ -1,6 +1,11 @@
 import pandas as pd
 from prophet import Prophet
 
+# forecast_prophet.py
+import pandas as pd
+from prophet import Prophet
+import os
+
 def prepare(df, region, product):
     sub = df[(df.region==region) & (df.product==product)][['date','sales']].rename(columns={'date':'ds','sales':'y'})
     return sub
@@ -27,4 +32,3 @@ if __name__=='__main__':
     out.rename(columns={'ds':'date','yhat':'forecast'}, inplace=True)
     out.to_csv('../data/forecast_output.csv', index=False)
     print('Forecasts written to ../data/forecast_output.csv')
-

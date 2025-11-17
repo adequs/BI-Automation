@@ -1,3 +1,4 @@
+# forecast_xgb.py
 import pandas as pd
 import numpy as np
 from xgboost import XGBRegressor
@@ -20,20 +21,23 @@ if __name__=='__main__':
         g = group.copy().sort_values('date')
         X = g[['lag_1','lag_7','rmean_7']].fillna(0)
         y = g['sales']
+        # last row(s) to forecast using last features
         model = XGBRegressor(n_estimators=200, learning_rate=0.05)
         model.fit(X, y)
         models[(reg,prod)] = model
+        # generate n-step forecast by iteratively predicting and updating lags
         last = g.iloc[-1:].copy()
-        for i in range(90):
+        steps = 90
+        for i in range(steps):
             X_last = last[['lag_1','lag_7','rmean_7']].values
             pred = model.predict(X_last)[0]
             next_date = last['date'].iloc[0] + pd.Timedelta(days=1)
             preds.append({'date': next_date, 'region':reg, 'product':prod, 'forecast':pred})
+            # update last for next iter (shift lags)
             new = last.copy()
             new['date'] = next_date
             new['lag_1'] = pred
-            # update lag_7, rolling logic needed here for production use
+            new['lag_7'] = new['lag_7']  # you can implement rolling shift logic
             last = new
     pd.DataFrame(preds).to_csv('../data/forecast_output_xgb.csv', index=False)
     joblib.dump(models, '../model/xgb_models.joblib')
-
