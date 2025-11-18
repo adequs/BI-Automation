@@ -40,4 +40,4 @@ if __name__=='__main__':
             new['lag_7'] = new['lag_7']  # you can implement rolling shift logic
             last = new
     pd.DataFrame(preds).to_csv('../data/forecast_output_xgb.csv', index=False)
-    joblib.dump(models, '../model/xgb_models.joblib')
+    joblib.dump(models, '../model/xgb_models.jobli/b')
